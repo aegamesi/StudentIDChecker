@@ -1,0 +1,20 @@
+{
+	"rooms": [
+		{"name": "RSF Fieldhouse", "id": "rsf"},
+		{"name": "1 Pimentel", "id": "pimentel"},
+		{"name": "105 Stanley", "id": "stanley"}
+	],
+	"assignments": [
+		{"room": "rsf", "conditions": [
+			{"key": "DISC", "op": ">=", "val": 11},
+			{"key": "DISC", "op": "<=", "val": 33}
+		]},
+		{"room": "pimentel", "conditions": [
+			{"key": "DISC", "op": "<=", "val": 43}
+		]},
+		{"room": "stanley", "conditions": [
+			{"key": "DISC", "op": "<=", "val": 48}
+		]},
+		{"room": "rsf", "conditions": []}
+	]
+}
