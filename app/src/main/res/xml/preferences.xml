@@ -7,4 +7,12 @@
     <Preference
         android:key="roominfo_load"
         android:title="@string/roominfo_load"/>
+
+    <ListPreference
+        android:key="current_room"
+        android:title="@string/current_room" />
+
+    <EditTextPreference
+        android:key="scanner_name"
+        android:title="@string/scanner_name" />
 </PreferenceScreen>

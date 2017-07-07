@@ -6,14 +6,14 @@
 	],
 	"assignments": [
 		{"room": "rsf", "conditions": [
-			{"key": "DISC", "op": ">=", "val": 11},
-			{"key": "DISC", "op": "<=", "val": 33}
+			{"key": "section_dis", "op": ">=", "val": 111},
+			{"key": "section_dis", "op": "<=", "val": 133}
 		]},
 		{"room": "pimentel", "conditions": [
-			{"key": "DISC", "op": "<=", "val": 43}
+			{"key": "section_dis", "op": "<=", "val": 143}
 		]},
 		{"room": "stanley", "conditions": [
-			{"key": "DISC", "op": "<=", "val": 48}
+			{"key": "section_dis", "op": "<=", "val": 148}
 		]},
 		{"room": "rsf", "conditions": []}
 	]
