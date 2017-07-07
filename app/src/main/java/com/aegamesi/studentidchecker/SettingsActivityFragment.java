@@ -3,29 +3,27 @@ package com.aegamesi.studentidchecker;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.support.v4.app.Fragment;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.aegamesi.studentidchecker.models.Room;
 import com.aegamesi.studentidchecker.models.Student;
+import com.aegamesi.studentidchecker.util.RoomUtilities;
+import com.aegamesi.studentidchecker.util.StudentUtilities;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import io.realm.Realm;
 
 public class SettingsActivityFragment extends PreferenceFragment {
 	private static final int REQUEST_LOAD_ROSTER = 1;
+	private static final int REQUEST_LOAD_ROOMINFO = 2;
 
 	private Preference prefLoadRoster;
-	private Preference prefClearRoster;
+	private Preference prefLoadRoominfo;
 
 	private Realm realm;
 
@@ -56,7 +54,28 @@ public class SettingsActivityFragment extends PreferenceFragment {
 
 				try {
 					InputStream is = getActivity().getContentResolver().openInputStream(uri);
-					RosterUtilities.loadRosterFromCSV(realm, is);
+					StudentUtilities.loadRosterFromCSV(realm, is);
+					success = true;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (success) {
+				updateUI();
+			} else {
+				Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
+			}
+		}
+
+		if (requestCode == REQUEST_LOAD_ROOMINFO) {
+			boolean success = false;
+			if (resultCode == Activity.RESULT_OK) {
+				Uri uri = data.getData();
+
+				try {
+					InputStream is = getActivity().getContentResolver().openInputStream(uri);
+					RoomUtilities.loadRoomInfoFromJSON(realm, is);
 					success = true;
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -73,7 +92,7 @@ public class SettingsActivityFragment extends PreferenceFragment {
 
 	private void setupPreferences() {
 		prefLoadRoster = findPreference("roster_load");
-		prefClearRoster = findPreference("roster_clear");
+		prefLoadRoominfo = findPreference("roominfo_load");
 
 		prefLoadRoster.setOnPreferenceClickListener(preference -> {
 			// load CSV file
@@ -84,11 +103,12 @@ public class SettingsActivityFragment extends PreferenceFragment {
 			startActivityForResult(i, REQUEST_LOAD_ROSTER);
 			return true;
 		});
-		prefClearRoster.setOnPreferenceClickListener(preference -> {
-			realm.executeTransaction((r) -> {
-				r.delete(Student.class);
-			});
-			updateUI();
+		prefLoadRoominfo.setOnPreferenceClickListener(preference -> {
+			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+			intent.addCategory(Intent.CATEGORY_OPENABLE);
+			intent.setType("*/*");
+			Intent i = Intent.createChooser(intent, getString(R.string.roominfo_select_json));
+			startActivityForResult(i, REQUEST_LOAD_ROOMINFO);
 			return true;
 		});
 	}
@@ -96,5 +116,7 @@ public class SettingsActivityFragment extends PreferenceFragment {
 	private void updateUI() {
 		long numStudents = realm.where(Student.class).count();
 		prefLoadRoster.setSummary(String.format(getString(R.string.roster_num_students), numStudents));
+		long numRooms = realm.where(Room.class).count();
+		prefLoadRoominfo.setSummary(String.format(getString(R.string.roominfo_num_rooms), numRooms));
 	}
 }

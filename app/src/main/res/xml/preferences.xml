@@ -5,6 +5,6 @@
         android:title="@string/roster_load"/>
 
     <Preference
-        android:key="roster_clear"
-        android:title="@string/roster_clear"/>
+        android:key="roominfo_load"
+        android:title="@string/roominfo_load"/>
 </PreferenceScreen>

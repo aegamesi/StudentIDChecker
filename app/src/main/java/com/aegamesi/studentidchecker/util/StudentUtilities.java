@@ -1,4 +1,4 @@
-package com.aegamesi.studentidchecker;
+package com.aegamesi.studentidchecker.util;
 
 import com.aegamesi.studentidchecker.models.Student;
 
@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 import io.realm.Realm;
 
-public class RosterUtilities {
+public class StudentUtilities {
 	private static final Pattern patternDis = Pattern.compile("DIS ([0-9]{3})");
 	private static final Pattern patternLab = Pattern.compile("LAB ([0-9]{3})");
 	private static final Pattern patternLec = Pattern.compile("LEC ([0-9]{3})");
@@ -47,6 +47,7 @@ public class RosterUtilities {
 		};
 
 		realm.beginTransaction();
+		realm.delete(Student.class);
 		try {
 			Map<String, Object> studentMap;
 			while ((studentMap = csv.read(header, processors)) != null) {
@@ -75,7 +76,7 @@ public class RosterUtilities {
 			}
 
 			realm.commitTransaction();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			realm.cancelTransaction();
 			throw e;
 		}

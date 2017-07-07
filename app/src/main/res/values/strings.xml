@@ -5,7 +5,9 @@
     <string name="error">Error</string>
 
     <string name="roster_load">Load Roster</string>
-    <string name="roster_clear">Clear Roster</string>
     <string name="roster_num_students">%1$d students loaded</string>
     <string name="roster_select_csv">Select Roster CSV</string>
+    <string name="roominfo_load">Load Room Info</string>
+    <string name="roominfo_num_rooms">%1$d rooms loaded</string>
+    <string name="roominfo_select_json">Select Room Info CSV</string>
 </resources>
