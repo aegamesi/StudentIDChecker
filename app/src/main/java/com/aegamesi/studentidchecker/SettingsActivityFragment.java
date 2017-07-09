@@ -76,7 +76,7 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 				try {
 					InputStream is = getActivity().getContentResolver().openInputStream(uri);
 					RoomUtilities.loadRoomInfoFromJSON(realm, is);
-					// prefCurrentRoom.setValueIndex(0);
+					prefCurrentRoom.setValueIndex(0);
 					updateUI();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -138,12 +138,14 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 		int numRooms = (int) realm.where(Room.class).count();
 		prefLoadRoominfo.setSummary(String.format(getString(R.string.roominfo_num_rooms), numRooms));
 
-		String[] roomNames = new String[numRooms];
-		String[] roomIds = new String[numRooms];
+		String[] roomNames = new String[numRooms + 1];
+		String[] roomIds = new String[numRooms + 1];
+		roomNames[0] = getString(R.string.other_room);
+		roomIds[0] = "";
 		RealmResults<Room> rooms = realm.where(Room.class).findAll();
 		for (int i = 0; i < rooms.size(); i++) {
-			roomNames[i] = rooms.get(i).name;
-			roomIds[i] = rooms.get(i).id;
+			roomNames[i + 1] = rooms.get(i).name;
+			roomIds[i + 1] = rooms.get(i).id;
 		}
 		prefCurrentRoom.setEntries(roomNames);
 		prefCurrentRoom.setEntryValues(roomIds);

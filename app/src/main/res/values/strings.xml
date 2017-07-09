@@ -12,4 +12,5 @@
     <string name="roominfo_select_json">Select Room Info CSV</string>
     <string name="current_room">Current Room</string>
     <string name="scanner_name">Scanner Name</string>
+    <string name="other_room">[Other Room]</string>
 </resources>
