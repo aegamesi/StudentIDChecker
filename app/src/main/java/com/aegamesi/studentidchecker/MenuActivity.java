@@ -13,8 +13,20 @@ public class MenuActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_menu);
+
+		findViewById(R.id.scan_physical).setOnClickListener((view) -> {
+			Intent intent = new Intent(this, ScanningActivity.class);
+			intent.putExtra("scanner", "physical");
+			startActivity(intent);
+		});
+		findViewById(R.id.scan_camera).setOnClickListener((view) -> {
+			Intent intent = new Intent(this, ScanningActivity.class);
+			intent.putExtra("scanner", "camera");
+			startActivity(intent);
+		});
 	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
