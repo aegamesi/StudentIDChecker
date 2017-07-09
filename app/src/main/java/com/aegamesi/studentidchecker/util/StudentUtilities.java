@@ -4,7 +4,6 @@ import com.aegamesi.studentidchecker.models.Student;
 
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseDouble;
-import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -32,7 +31,7 @@ public class StudentUtilities {
 		CsvMapReader csv = new CsvMapReader(reader, CsvPreference.STANDARD_PREFERENCE);
 
 		final String[] header = csv.getHeader(true);
-		final CellProcessor[] processors = new CellProcessor[] {
+		final CellProcessor[] processors = new CellProcessor[]{
 				new NotNull(), // Name
 				new NotNull(new ParseLong()), // Student ID
 				new NotNull(new ParseLong()), // User ID

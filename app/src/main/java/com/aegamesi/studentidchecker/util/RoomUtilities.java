@@ -2,7 +2,6 @@ package com.aegamesi.studentidchecker.util;
 
 import com.aegamesi.studentidchecker.models.Room;
 import com.aegamesi.studentidchecker.models.RoomAssignment;
-import com.aegamesi.studentidchecker.models.RoomAssignmentCondition;
 import com.aegamesi.studentidchecker.models.RoomInfo;
 import com.squareup.moshi.Moshi;
 

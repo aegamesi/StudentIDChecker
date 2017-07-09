@@ -1,7 +1,7 @@
 package com.aegamesi.studentidchecker;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
@@ -17,6 +17,8 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_scanning);
 
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 		viewScanResult = findViewById(R.id.scan_result);
 		textScanName = (TextView) findViewById(R.id.scan_name);
 		textScanStatus = (TextView) findViewById(R.id.scan_status);
@@ -24,7 +26,7 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 		viewScanResult.setVisibility(View.GONE);
 
 		// set up scanning fragment
-		switch(getIntent().getStringExtra("scanner")) {
+		switch (getIntent().getStringExtra("scanner")) {
 			default: // default: physical
 			case "physical":
 				scanner = new PhysicalScanningFragment();

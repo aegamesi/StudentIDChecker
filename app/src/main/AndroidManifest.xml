@@ -26,7 +26,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.aegamesi.studentidchecker.MenuActivity"/>
         </activity>
-        <activity android:name=".ScanningActivity">
+        <activity android:name=".ScanningActivity"
+                  android:parentActivityName=".MenuActivity"
+                  android:windowSoftInputMode="adjustResize">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.aegamesi.studentidchecker.MenuActivity"/>
         </activity>
     </application>
 
