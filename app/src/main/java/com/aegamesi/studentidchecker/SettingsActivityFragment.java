@@ -141,7 +141,7 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 		String[] roomNames = new String[numRooms + 1];
 		String[] roomIds = new String[numRooms + 1];
 		roomNames[0] = getString(R.string.other_room);
-		roomIds[0] = "";
+		roomIds[0] = Room.OTHER_ID;
 		RealmResults<Room> rooms = realm.where(Room.class).findAll();
 		for (int i = 0; i < rooms.size(); i++) {
 			roomNames[i + 1] = rooms.get(i).name;

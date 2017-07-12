@@ -21,4 +21,9 @@
 
     <string name="start_scanning_physical">Start Scanning (Physical/Manual)</string>
     <string name="start_scanning_camera">Start Scanning (Camera)</string>
+
+    <string name="scanresult_ok">OK</string>
+    <string name="scanresult_unknown_error">Unknown Error!</string>
+    <string name="scanresult_bad_room">INCORRECT ROOM\n[%1$s]</string>
+    <string name="scanresult_not_enrolled">NOT ENROLLED</string>
 </resources>
