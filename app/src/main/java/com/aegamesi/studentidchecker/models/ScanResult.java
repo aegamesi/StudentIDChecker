@@ -14,6 +14,7 @@ public class ScanResult extends RealmObject {
 	public static final int STATUS_UNKNOWN_ERROR = 1;
 	public static final int STATUS_BAD_ROOM = 2;
 	public static final int STATUS_NOT_ENROLLED = 3;
+	private static final String[] STATUS_NAMES = {"OK", "UNKNOWN_ERROR", "BAD_ROOM", "NOT_ENROLLED"};
 
 	public Date scannedAt;
 	public String scannerName;
@@ -47,5 +48,9 @@ public class ScanResult extends RealmObject {
 			default:
 				return context.getString(R.string.scanresult_unknown_error);
 		}
+	}
+
+	public String getStatusName() {
+		return STATUS_NAMES[status];
 	}
 }

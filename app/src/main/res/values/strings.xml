@@ -26,4 +26,6 @@
     <string name="scanresult_unknown_error">Unknown Error!</string>
     <string name="scanresult_bad_room">INCORRECT ROOM\n[%1$s]</string>
     <string name="scanresult_not_enrolled">NOT ENROLLED</string>
+
+    <string name="log_export">Export Scan Log (CSV)</string>
 </resources>
