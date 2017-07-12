@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.aegamesi.studentidchecker.models.Room;
@@ -16,14 +18,19 @@ import java.util.Date;
 
 import io.realm.Realm;
 
-public class ScanningActivity extends AppCompatActivity implements ScanningFragment.OnBarcodeScanListener {
+public class ScanningActivity extends AppCompatActivity implements ScanningFragment.OnBarcodeScanListener, View.OnClickListener {
 	private ScanningFragment scanner;
 	private Realm realm;
 	private SharedPreferences prefs;
 
+	private ScanResult lastScan = null;
+
 	private View viewScanResult;
+	private View viewScanButtons;
 	private TextView textScanName;
 	private TextView textScanStatus;
+	private Button buttonConfirm;
+	private Button buttonCancel;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +42,14 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
 		viewScanResult = findViewById(R.id.scan_result);
+		viewScanButtons = findViewById(R.id.scan_buttons);
 		textScanName = (TextView) findViewById(R.id.scan_name);
 		textScanStatus = (TextView) findViewById(R.id.scan_status);
+		buttonCancel = (Button) findViewById(R.id.cancel);
+		buttonConfirm = (Button) findViewById(R.id.confirm);
 
+		buttonConfirm.setOnClickListener(this);
+		buttonCancel.setOnClickListener(this);
 		viewScanResult.setVisibility(View.GONE);
 
 		// set up scanning fragment
@@ -62,10 +74,29 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 	}
 
 	@Override
+	public void onClick(View view) {
+		if (view == buttonCancel) {
+			lastScan = null;
+			viewScanResult.setVisibility(View.GONE);
+		}
+		if (view == buttonConfirm) {
+			realm.executeTransaction((r) -> {
+				r.copyToRealm(lastScan);
+			});
+			Log.i("Scanner", "total scan results in realm: " + realm.where(ScanResult.class).count());
+
+			lastScan = null;
+			viewScanButtons.setVisibility(View.GONE);
+		}
+	}
+
+	@Override
 	public void onBarcodeScanned(String barcode) {
 		ScanResult result = generateScanResult(barcode);
+		lastScan = result;
 
 		viewScanResult.setVisibility(View.VISIBLE);
+		viewScanButtons.setVisibility(View.VISIBLE);
 		textScanName.setText(result.getNameMessage(this));
 		textScanStatus.setText(result.getStatusMessage(this, realm));
 
