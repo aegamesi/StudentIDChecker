@@ -15,6 +15,9 @@ public abstract class ScanningFragment extends Fragment {
 		}
 	}
 
+	public void notifyBarcodeHandled() {
+	}
+
 	public interface OnBarcodeScanListener {
 		void onBarcodeScanned(String barcode);
 	}

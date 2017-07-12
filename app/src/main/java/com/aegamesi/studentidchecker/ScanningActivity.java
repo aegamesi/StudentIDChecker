@@ -59,7 +59,7 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 				scanner = new PhysicalScanningFragment();
 				break;
 			case "camera":
-				// TODO
+				scanner = new CameraScanningFragment();
 				break;
 		}
 		getFragmentManager().beginTransaction().add(R.id.scanning_fragment, scanner).commit();
@@ -75,18 +75,21 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 
 	@Override
 	public void onClick(View view) {
-		if (view == buttonCancel) {
-			lastScan = null;
-			viewScanResult.setVisibility(View.GONE);
-		}
-		if (view == buttonConfirm) {
-			realm.executeTransaction((r) -> {
-				r.copyToRealm(lastScan);
-			});
-			Log.i("Scanner", "total scan results in realm: " + realm.where(ScanResult.class).count());
+		if (view == buttonConfirm || view == buttonCancel) {
+			if (view == buttonCancel) {
+				viewScanResult.setVisibility(View.GONE);
+			}
 
+			if (view == buttonConfirm) {
+				realm.executeTransaction((r) -> {
+					r.copyToRealm(lastScan);
+				});
+				Log.i("Scanner", "total scan results in realm: " + realm.where(ScanResult.class).count());
+				viewScanButtons.setVisibility(View.GONE);
+			}
+
+			scanner.notifyBarcodeHandled();
 			lastScan = null;
-			viewScanButtons.setVisibility(View.GONE);
 		}
 	}
 
