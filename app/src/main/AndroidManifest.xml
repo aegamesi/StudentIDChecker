@@ -2,6 +2,8 @@
 <manifest package="com.aegamesi.studentidchecker"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"

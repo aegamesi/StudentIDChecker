@@ -2,6 +2,7 @@ package com.aegamesi.studentidchecker;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -67,6 +68,9 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 		viewScanResult.setVisibility(View.VISIBLE);
 		textScanName.setText(result.getNameMessage(this));
 		textScanStatus.setText(result.getStatusMessage(this, realm));
+
+		Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+		vibrator.vibrate(result.status == ScanResult.STATUS_OK ? 100 : 1500);
 	}
 
 	private ScanResult generateScanResult(String barcode) {
