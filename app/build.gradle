@@ -25,6 +25,12 @@ android {
     }
 }
 
+repositories {
+    maven {
+        url 'https://github.com/uPhyca/stetho-realm/raw/master/maven-repo'
+    }
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -42,4 +48,8 @@ dependencies {
     compile 'net.sf.supercsv:super-csv:2.4.0'
     compile 'com.squareup.moshi:moshi:1.5.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+
+    // Stetho
+    compile 'com.facebook.stetho:stetho:1.5.0'
+    compile 'com.uphyca:stetho_realm:2.0.0'
 }
