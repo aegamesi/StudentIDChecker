@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aegamesi.studentidchecker.models.Room;
@@ -31,6 +32,7 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 	private TextView textScanStatus;
 	private Button buttonConfirm;
 	private Button buttonCancel;
+	private ImageView imageScanImage;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,7 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 		textScanStatus = (TextView) findViewById(R.id.scan_status);
 		buttonCancel = (Button) findViewById(R.id.cancel);
 		buttonConfirm = (Button) findViewById(R.id.confirm);
+		imageScanImage = (ImageView) findViewById(R.id.scan_image);
 
 		buttonConfirm.setOnClickListener(this);
 		buttonCancel.setOnClickListener(this);
@@ -88,6 +91,7 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 				viewScanButtons.setVisibility(View.GONE);
 			}
 
+			imageScanImage.setVisibility(View.GONE);
 			scanner.notifyBarcodeHandled();
 			lastScan = null;
 		}
@@ -102,6 +106,9 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 		viewScanButtons.setVisibility(View.VISIBLE);
 		textScanName.setText(result.getNameMessage(this));
 		textScanStatus.setText(result.getStatusMessage(this, realm));
+		imageScanImage.setVisibility(View.VISIBLE);
+
+		// TODO find and load image into imageScanImage
 
 		Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 		vibrator.vibrate(result.status == ScanResult.STATUS_OK ? 100 : 1500);
