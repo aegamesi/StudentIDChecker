@@ -8,6 +8,10 @@
         android:key="roominfo_load"
         android:title="@string/roominfo_load"/>
 
+    <Preference
+        android:key="photos_load"
+        android:title="@string/photos_load"/>
+
     <ListPreference
         android:key="current_room"
         android:title="@string/current_room" />

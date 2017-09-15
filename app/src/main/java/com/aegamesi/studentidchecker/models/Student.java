@@ -15,6 +15,8 @@ public class Student extends RealmObject {
 	public int sectionLab;
 	public int sectionLec;
 
+	public byte[] photo;
+
 	public Room getAssignedRoom(Realm realm) {
 		for (RoomAssignment assignment : realm.where(RoomAssignment.class).findAll()) {
 			if (assignment.matches(this)) {

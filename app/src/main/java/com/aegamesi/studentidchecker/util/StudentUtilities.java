@@ -1,5 +1,8 @@
 package com.aegamesi.studentidchecker.util;
 
+import android.net.Uri;
+import android.util.Log;
+
 import com.aegamesi.studentidchecker.models.Student;
 
 import org.supercsv.cellprocessor.Optional;
@@ -11,15 +14,20 @@ import org.supercsv.io.CsvMapReader;
 import org.supercsv.prefs.CsvPreference;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class StudentUtilities {
 	private static final Pattern patternDis = Pattern.compile("DIS ([0-9]{3})");
@@ -72,6 +80,57 @@ public class StudentUtilities {
 					barcode = barcode.substring(barcode.length() - 8);
 				}
 				student.barcode = barcode;
+			}
+
+			realm.commitTransaction();
+		} catch (Exception e) {
+			realm.cancelTransaction();
+			throw e;
+		}
+	}
+
+	public static void loadPhotosFromZIP(Realm realm, InputStream is) throws IOException {
+		realm.beginTransaction();
+
+		// discard all old photos
+		RealmResults<Student> students = realm.where(Student.class).findAll();
+		for (Student student : students) {
+			student.photo = null;
+		}
+
+		byte[] buffer = new byte[4096];
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		try {
+			ZipInputStream zipInputStream = new ZipInputStream(is);
+			ZipEntry entry;
+			while ((entry = zipInputStream.getNextEntry()) != null) {
+				Uri uri = Uri.parse(entry.getName());
+				String identifier = uri.getLastPathSegment();
+				Log.d("aaa", identifier);
+
+				long userId;
+				int extension = identifier.lastIndexOf('.');
+				if (extension != -1) {
+					identifier = identifier.substring(0, extension);
+				}
+				try {
+					userId = Long.parseLong(identifier);
+				} catch (NumberFormatException e) {
+					continue;
+				}
+
+				int len;
+				while ((len = zipInputStream.read(buffer)) > 0) {
+					baos.write(buffer, 0, len);
+				}
+
+				Student s = realm.where(Student.class).equalTo("userId", userId).findFirst();
+				if (s != null) {
+					s.photo = baos.toByteArray();
+				}
+
+				baos.reset();
 			}
 
 			realm.commitTransaction();

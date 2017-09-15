@@ -1,6 +1,7 @@
 package com.aegamesi.studentidchecker;
 
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
@@ -106,9 +107,13 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 		viewScanButtons.setVisibility(View.VISIBLE);
 		textScanName.setText(result.getNameMessage(this));
 		textScanStatus.setText(result.getStatusMessage(this, realm));
-		imageScanImage.setVisibility(View.VISIBLE);
 
 		// TODO find and load image into imageScanImage
+		if (result.student != null && result.student.photo != null) {
+			byte[] data = result.student.photo;
+			imageScanImage.setImageBitmap(BitmapFactory.decodeByteArray(data, 0, data.length));
+			imageScanImage.setVisibility(View.VISIBLE);
+		}
 
 		Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 		vibrator.vibrate(result.status == ScanResult.STATUS_OK ? 100 : 1500);
@@ -127,11 +132,14 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 			return result;
 		}
 
-		String correctRoom = result.student.getAssignedRoom(realm).id;
-		boolean isCorrectRoom = result.scannerRoom.equals(correctRoom) || result.scannerRoom.equals(Room.OTHER_ID);
-		if (!isCorrectRoom) {
-			result.status = ScanResult.STATUS_BAD_ROOM;
-			return result;
+		Room assignedRoom = result.student.getAssignedRoom(realm);
+		if (assignedRoom != null) {
+			String assignedRoomId = assignedRoom.id;
+			boolean isCorrect = result.scannerRoom.equals(assignedRoomId) || result.scannerRoom.equals(Room.OTHER_ID);
+			if (!isCorrect) {
+				result.status = ScanResult.STATUS_BAD_ROOM;
+				return result;
+			}
 		}
 
 		result.status = ScanResult.STATUS_OK;

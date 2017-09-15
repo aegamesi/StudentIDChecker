@@ -26,7 +26,9 @@ import io.realm.RealmResults;
 public class SettingsActivityFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 	private static final int REQUEST_LOAD_ROSTER = 1;
 	private static final int REQUEST_LOAD_ROOMINFO = 2;
+	private static final int REQUEST_LOAD_PHOTOS = 3;
 
+	private Preference prefLoadPhotos;
 	private Preference prefLoadRoster;
 	private Preference prefLoadRoominfo;
 	private ListPreference prefCurrentRoom;
@@ -84,9 +86,25 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 				}
 			}
 		}
+
+		if (requestCode == REQUEST_LOAD_PHOTOS) {
+			if (resultCode == Activity.RESULT_OK) {
+				Uri uri = data.getData();
+
+				try {
+					InputStream is = getActivity().getContentResolver().openInputStream(uri);
+					StudentUtilities.loadPhotosFromZIP(realm, is);
+					updateUI();
+				} catch (IOException e) {
+					e.printStackTrace();
+					Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
+				}
+			}
+		}
 	}
 
 	private void setupPreferences() {
+		prefLoadPhotos = findPreference("photos_load");
 		prefLoadRoster = findPreference("roster_load");
 		prefLoadRoominfo = findPreference("roominfo_load");
 		prefCurrentRoom = (ListPreference) findPreference("current_room");
@@ -109,6 +127,15 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 			startActivityForResult(i, REQUEST_LOAD_ROOMINFO);
 			return true;
 		});
+		prefLoadPhotos.setOnPreferenceClickListener(preference -> {
+			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+			intent.addCategory(Intent.CATEGORY_OPENABLE);
+			intent.setType("*/*");
+			Intent i = Intent.createChooser(intent, getString(R.string.photos_select_zip));
+			startActivityForResult(i, REQUEST_LOAD_PHOTOS);
+			return true;
+		});
+
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		prefs.registerOnSharedPreferenceChangeListener(this);
@@ -137,6 +164,8 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 		prefLoadRoster.setSummary(String.format(getString(R.string.roster_num_students), numStudents));
 		int numRooms = (int) realm.where(Room.class).count();
 		prefLoadRoominfo.setSummary(String.format(getString(R.string.roominfo_num_rooms), numRooms));
+		int numPhotos = (int) realm.where(Student.class).isNotNull("photo").count();
+		prefLoadPhotos.setSummary(String.format(getString(R.string.photos_num_photos), numPhotos));
 
 		String[] roomNames = new String[numRooms + 1];
 		String[] roomIds = new String[numRooms + 1];
