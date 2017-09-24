@@ -11,6 +11,7 @@ import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvMapReader;
+import org.supercsv.io.CsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 
 import java.io.BufferedReader;
@@ -18,28 +19,30 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 
 public class StudentUtilities {
-	private static final Pattern patternDis = Pattern.compile("DIS ([0-9]{3})");
-	private static final Pattern patternLab = Pattern.compile("LAB ([0-9]{3})");
-	private static final Pattern patternLec = Pattern.compile("LEC ([0-9]{3})");
+	private static final Pattern patternDis = Pattern.compile("DIS ([0-9]+)");
+	private static final Pattern patternLab = Pattern.compile("LAB ([0-9]+)");
+	private static final Pattern patternLec = Pattern.compile("LEC ([0-9]+)");
 
-	public static void loadRosterFromCSV(Realm realm, InputStream is) throws IOException {
-		Reader reader = new BufferedReader(new InputStreamReader(is));
-		CsvMapReader csv = new CsvMapReader(reader, CsvPreference.STANDARD_PREFERENCE);
-
-		final String[] header = csv.getHeader(true);
-		final CellProcessor[] processors = new CellProcessor[]{
+	private static CellProcessor[] getRosterCSVCellProcessors() {
+		return new CellProcessor[]{
 				new NotNull(), // Name
 				new NotNull(new ParseLong()), // Student ID
 				new NotNull(new ParseLong()), // User ID
@@ -52,6 +55,14 @@ public class StudentUtilities {
 				new Optional(), // Grading Basis
 				new Optional(), // Waitlist Position
 		};
+	}
+
+	public static void loadRosterFromCSV(Realm realm, InputStream is) throws IOException {
+		Reader reader = new BufferedReader(new InputStreamReader(is));
+		CsvMapReader csv = new CsvMapReader(reader, CsvPreference.STANDARD_PREFERENCE);
+
+		String[] header = csv.getHeader(true);
+		CellProcessor[] processors = getRosterCSVCellProcessors();
 
 		realm.beginTransaction();
 		realm.delete(Student.class);
@@ -89,6 +100,30 @@ public class StudentUtilities {
 		}
 	}
 
+	public static void saveRosterToCSV(Realm realm, OutputStream os) throws IOException {
+		OutputStreamWriter writer = new OutputStreamWriter(os);
+		CsvMapWriter csv = new CsvMapWriter(writer, CsvPreference.STANDARD_PREFERENCE);
+
+		CellProcessor[] processors = getRosterCSVCellProcessors();
+		String[] header = {"Name", "Student ID", "User ID", "Role", "Email Address", "Sections", "Majors", "Terms in Attendance", "Units", "Grading Basis", "Waitlist Position"};
+		Map<String, Object> map = new HashMap<>();
+
+		csv.writeHeader(header);
+		RealmResults<Student> students = realm.where(Student.class).findAll();
+		for (Student student : students) {
+			map.clear();
+			map.put(header[0], student.name);
+			map.put(header[1], student.studentId);
+			map.put(header[2], student.userId);
+			map.put(header[4], student.email);
+			map.put(header[5], String.format(Locale.getDefault(), "LEC %d, DIS %d, LAB %d",
+					student.sectionLec, student.sectionDis, student.sectionLab));
+			csv.write(map, header, processors);
+		}
+
+		csv.flush();
+	}
+
 	public static void loadPhotosFromZIP(Realm realm, InputStream is) throws IOException {
 		realm.beginTransaction();
 
@@ -107,7 +142,6 @@ public class StudentUtilities {
 			while ((entry = zipInputStream.getNextEntry()) != null) {
 				Uri uri = Uri.parse(entry.getName());
 				String identifier = uri.getLastPathSegment();
-				Log.d("aaa", identifier);
 
 				long userId;
 				int extension = identifier.lastIndexOf('.');
@@ -138,5 +172,22 @@ public class StudentUtilities {
 			realm.cancelTransaction();
 			throw e;
 		}
+	}
+
+	public static void savePhotosToZIP(Realm realm, OutputStream os) throws IOException {
+		ZipOutputStream zos = new ZipOutputStream(os);
+		zos.setLevel(Deflater.NO_COMPRESSION);
+
+		RealmResults<Student> students = realm.where(Student.class).findAll();
+		for (Student student : students) {
+			if (student.photo != null) {
+				ZipEntry ze = new ZipEntry(student.userId + ".jpg");
+				zos.putNextEntry(ze);
+				zos.write(student.photo);
+				zos.closeEntry();
+			}
+		}
+
+		zos.finish();
 	}
 }

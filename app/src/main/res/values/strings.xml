@@ -34,4 +34,8 @@
     <string name="scanresult_not_enrolled">NOT ENROLLED</string>
 
     <string name="log_export">Export Scan Log (CSV)</string>
+
+    <string name="settings_import_export">Import/Export Settings</string>
+    <string name="settings_export">Export Settings (ZIP)</string>
+    <string name="settings_import">Import Settings (QR)</string>
 </resources>

@@ -14,9 +14,12 @@ import android.widget.Toast;
 
 import com.aegamesi.studentidchecker.models.Room;
 import com.aegamesi.studentidchecker.models.Student;
+import com.aegamesi.studentidchecker.util.AndroidUtil;
+import com.aegamesi.studentidchecker.util.ExportUtilities;
 import com.aegamesi.studentidchecker.util.RoomUtilities;
 import com.aegamesi.studentidchecker.util.StudentUtilities;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -31,6 +34,7 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 	private Preference prefLoadPhotos;
 	private Preference prefLoadRoster;
 	private Preference prefLoadRoominfo;
+	private Preference prefExportSettings;
 	private ListPreference prefCurrentRoom;
 	private EditTextPreference prefScannerName;
 
@@ -96,6 +100,7 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 		prefLoadPhotos = findPreference("photos_load");
 		prefLoadRoster = findPreference("roster_load");
 		prefLoadRoominfo = findPreference("roominfo_load");
+		prefExportSettings = findPreference("settings_export");
 		prefCurrentRoom = (ListPreference) findPreference("current_room");
 		prefScannerName = (EditTextPreference) findPreference("scanner_name");
 
@@ -109,6 +114,12 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 		});
 		prefLoadPhotos.setOnPreferenceClickListener(preference -> {
 			requestFile(REQUEST_LOAD_PHOTOS, R.string.photos_select_zip);
+			return true;
+		});
+
+		prefExportSettings.setOnPreferenceClickListener(preference -> {
+			File zip = ExportUtilities.exportSettingsToZIP(getActivity(), realm);
+			AndroidUtil.shareFile(getActivity(), zip, "application/zip", R.string.settings_export);
 			return true;
 		});
 

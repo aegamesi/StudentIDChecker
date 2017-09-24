@@ -19,4 +19,21 @@
     <EditTextPreference
         android:key="scanner_name"
         android:title="@string/scanner_name" />
+
+    <Preference
+        android:key="photos_load"
+        android:title="@string/photos_load"/>
+
+    <PreferenceCategory
+        android:title="@string/settings_import_export"
+        android:key="import_export">
+
+        <Preference
+            android:key="settings_import"
+            android:title="@string/settings_import"/>
+
+        <Preference
+            android:key="settings_export"
+            android:title="@string/settings_export"/>
+    </PreferenceCategory>
 </PreferenceScreen>

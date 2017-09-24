@@ -7,8 +7,10 @@ import com.squareup.moshi.Moshi;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import io.realm.Realm;
+import okio.BufferedSink;
 import okio.BufferedSource;
 import okio.Okio;
 
@@ -29,5 +31,19 @@ public class RoomUtilities {
 				r.copyToRealm(roomInfo.assignments);
 			});
 		}
+	}
+
+	public static void saveRoomInfoToJSON(Realm realm, OutputStream os) throws IOException {
+		Moshi moshi = new Moshi.Builder()
+				.add(new RealmListJsonAdapter())
+				.build();
+
+		RoomInfo roomInfo = new RoomInfo();
+		roomInfo.rooms = realm.where(Room.class).findAll();
+		roomInfo.assignments = realm.where(RoomAssignment.class).findAll();
+
+		BufferedSink sink = Okio.buffer(Okio.sink(os));
+		moshi.adapter(RoomInfo.class).toJson(sink, roomInfo);
+		sink.flush();
 	}
 }
