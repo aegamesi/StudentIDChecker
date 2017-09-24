@@ -50,57 +50,46 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-
 		realm.close();
 	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == REQUEST_LOAD_ROSTER) {
-			if (resultCode == Activity.RESULT_OK) {
-				Uri uri = data.getData();
+		if (resultCode == Activity.RESULT_OK) {
+			receiveFile(data, requestCode, REQUEST_LOAD_ROSTER, (is -> {
+				StudentUtilities.loadRosterFromCSV(realm, is);
+			}));
+			receiveFile(data, requestCode, REQUEST_LOAD_ROOMINFO, is -> {
+				RoomUtilities.loadRoomInfoFromJSON(realm, is);
+				prefCurrentRoom.setValueIndex(0);
+			});
+			receiveFile(data, requestCode, REQUEST_LOAD_PHOTOS, is -> {
+				StudentUtilities.loadPhotosFromZIP(realm, is);
+			});
+		}
+	}
 
-				try {
-					InputStream is = getActivity().getContentResolver().openInputStream(uri);
-					StudentUtilities.loadRosterFromCSV(realm, is);
-					updateUI();
-				} catch (IOException e) {
-					e.printStackTrace();
-					Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
-				}
+	private void receiveFile(Intent data, int actual, int expected, IFileLoadHandler handler) {
+		if (actual == expected) {
+			Uri uri = data.getData();
+
+			try {
+				InputStream is = getActivity().getContentResolver().openInputStream(uri);
+				handler.handle(is);
+				updateUI();
+			} catch (IOException e) {
+				e.printStackTrace();
+				Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
 			}
 		}
+	}
 
-		if (requestCode == REQUEST_LOAD_ROOMINFO) {
-			if (resultCode == Activity.RESULT_OK) {
-				Uri uri = data.getData();
-
-				try {
-					InputStream is = getActivity().getContentResolver().openInputStream(uri);
-					RoomUtilities.loadRoomInfoFromJSON(realm, is);
-					prefCurrentRoom.setValueIndex(0);
-					updateUI();
-				} catch (IOException e) {
-					e.printStackTrace();
-					Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
-				}
-			}
-		}
-
-		if (requestCode == REQUEST_LOAD_PHOTOS) {
-			if (resultCode == Activity.RESULT_OK) {
-				Uri uri = data.getData();
-
-				try {
-					InputStream is = getActivity().getContentResolver().openInputStream(uri);
-					StudentUtilities.loadPhotosFromZIP(realm, is);
-					updateUI();
-				} catch (IOException e) {
-					e.printStackTrace();
-					Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
-				}
-			}
-		}
+	private void requestFile(int requestCode, int prompt) {
+		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
+		intent.setType("*/*");
+		Intent i = Intent.createChooser(intent, getString(prompt));
+		startActivityForResult(i, requestCode);
 	}
 
 	private void setupPreferences() {
@@ -111,31 +100,17 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 		prefScannerName = (EditTextPreference) findPreference("scanner_name");
 
 		prefLoadRoster.setOnPreferenceClickListener(preference -> {
-			// load CSV file
-			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-			intent.addCategory(Intent.CATEGORY_OPENABLE);
-			intent.setType("*/*");
-			Intent i = Intent.createChooser(intent, getString(R.string.roster_select_csv));
-			startActivityForResult(i, REQUEST_LOAD_ROSTER);
+			requestFile(REQUEST_LOAD_ROSTER, R.string.roster_select_csv);
 			return true;
 		});
 		prefLoadRoominfo.setOnPreferenceClickListener(preference -> {
-			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-			intent.addCategory(Intent.CATEGORY_OPENABLE);
-			intent.setType("*/*");
-			Intent i = Intent.createChooser(intent, getString(R.string.roominfo_select_json));
-			startActivityForResult(i, REQUEST_LOAD_ROOMINFO);
+			requestFile(REQUEST_LOAD_ROOMINFO, R.string.roominfo_select_json);
 			return true;
 		});
 		prefLoadPhotos.setOnPreferenceClickListener(preference -> {
-			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-			intent.addCategory(Intent.CATEGORY_OPENABLE);
-			intent.setType("*/*");
-			Intent i = Intent.createChooser(intent, getString(R.string.photos_select_zip));
-			startActivityForResult(i, REQUEST_LOAD_PHOTOS);
+			requestFile(REQUEST_LOAD_PHOTOS, R.string.photos_select_zip);
 			return true;
 		});
-
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		prefs.registerOnSharedPreferenceChangeListener(this);
@@ -180,5 +155,9 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 		prefCurrentRoom.setEntryValues(roomIds);
 		prefCurrentRoom.setSummary(prefCurrentRoom.getEntry());
 		prefScannerName.setSummary(prefScannerName.getText());
+	}
+
+	private interface IFileLoadHandler {
+		void handle(InputStream is) throws IOException;
 	}
 }
