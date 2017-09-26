@@ -81,14 +81,14 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 	public void onClick(View view) {
 		if (view == buttonConfirm || view == buttonCancel) {
 			if (view == buttonCancel) {
+				// remove last scan
+				realm.executeTransaction((r) -> {
+					r.where(ScanResult.class).equalTo("scannedAt", lastScan.scannedAt).findFirst().deleteFromRealm();
+				});
 				viewScanResult.setVisibility(View.GONE);
 			}
 
 			if (view == buttonConfirm) {
-				realm.executeTransaction((r) -> {
-					r.copyToRealm(lastScan);
-				});
-				Log.i("Scanner", "total scan results in realm: " + realm.where(ScanResult.class).count());
 				viewScanButtons.setVisibility(View.GONE);
 			}
 
@@ -108,12 +108,14 @@ public class ScanningActivity extends AppCompatActivity implements ScanningFragm
 		textScanName.setText(result.getNameMessage(this));
 		textScanStatus.setText(result.getStatusMessage(this, realm));
 
-		// TODO find and load image into imageScanImage
 		if (result.student != null && result.student.photo != null) {
 			byte[] data = result.student.photo;
 			imageScanImage.setImageBitmap(BitmapFactory.decodeByteArray(data, 0, data.length));
 			imageScanImage.setVisibility(View.VISIBLE);
 		}
+		realm.executeTransaction((r) -> {
+			r.copyToRealm(lastScan);
+		});
 
 		Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 		vibrator.vibrate(result.status == ScanResult.STATUS_OK ? 100 : 1500);
