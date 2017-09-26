@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
+import com.aegamesi.studentidchecker.util.AndroidUtil;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -54,7 +56,7 @@ public class CameraScanningFragment extends ScanningFragment implements ZBarScan
 
 	@SuppressLint("NewApi")
 	private void startCamera() {
-		if (haveCameraPermission()) {
+		if (AndroidUtil.haveCameraPermission(getActivity())) {
 			scannerView.setResultHandler(this);
 			scannerView.startCamera();
 		} else {
@@ -75,13 +77,6 @@ public class CameraScanningFragment extends ScanningFragment implements ZBarScan
 				getActivity().finish();
 			}
 		}
-	}
-
-	private boolean haveCameraPermission() {
-		if (Build.VERSION.SDK_INT < 23) {
-			return true;
-		}
-		return getActivity().checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
 	}
 
 	@Override

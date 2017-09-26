@@ -1,10 +1,13 @@
 package com.aegamesi.studentidchecker.util;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.content.FileProvider;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.content.res.AppCompatResources;
@@ -34,5 +37,12 @@ public class AndroidUtil {
 		} else {
 			Toast.makeText(c, R.string.error, Toast.LENGTH_LONG).show();
 		}
+	}
+
+	public static boolean haveCameraPermission(Context context) {
+		if (Build.VERSION.SDK_INT < 23) {
+			return true;
+		}
+		return context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
 	}
 }

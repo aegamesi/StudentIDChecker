@@ -3,7 +3,8 @@
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".MyApplication"
@@ -13,7 +14,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.aegamesi.studentidchecker.fileprovider"
@@ -21,7 +21,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/paths" />
+                android:resource="@xml/paths"/>
         </provider>
 
         <activity android:name=".MenuActivity">
@@ -40,12 +40,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.aegamesi.studentidchecker.MenuActivity"/>
         </activity>
-        <activity android:name=".ScanningActivity"
-                  android:parentActivityName=".MenuActivity"
-                  android:windowSoftInputMode="adjustResize">
+        <activity
+            android:name=".ScanningActivity"
+            android:parentActivityName=".MenuActivity"
+            android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.aegamesi.studentidchecker.MenuActivity"/>
+        </activity>
+        <activity android:name=".ConfigScanningActivity">
         </activity>
     </application>
 

@@ -35,6 +35,7 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 	private Preference prefLoadRoster;
 	private Preference prefLoadRoominfo;
 	private Preference prefExportSettings;
+	private Preference prefImportSettings;
 	private ListPreference prefCurrentRoom;
 	private EditTextPreference prefScannerName;
 
@@ -100,6 +101,7 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 		prefLoadPhotos = findPreference("photos_load");
 		prefLoadRoster = findPreference("roster_load");
 		prefLoadRoominfo = findPreference("roominfo_load");
+		prefImportSettings = findPreference("settings_import");
 		prefExportSettings = findPreference("settings_export");
 		prefCurrentRoom = (ListPreference) findPreference("current_room");
 		prefScannerName = (EditTextPreference) findPreference("scanner_name");
@@ -120,6 +122,12 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 		prefExportSettings.setOnPreferenceClickListener(preference -> {
 			File zip = ExportUtilities.exportSettingsToZIP(getActivity(), realm);
 			AndroidUtil.shareFile(getActivity(), zip, "application/zip", R.string.settings_export);
+			return true;
+		});
+
+		prefImportSettings.setOnPreferenceClickListener(preference -> {
+			Intent intent = new Intent(getActivity(), ConfigScanningActivity.class);
+			startActivity(intent);
 			return true;
 		});
 

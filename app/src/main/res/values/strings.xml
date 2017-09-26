@@ -8,6 +8,8 @@
     <string name="go">Go</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
+    <string name="camera_permission_required">Camera permissions are required.</string>
+    <string name="downloading">Downloading…</string>
 
     <string name="roster_load">Load Roster</string>
     <string name="roster_num_students">%1$d students loaded</string>
