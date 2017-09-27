@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +29,7 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collections;
+import java.util.function.Consumer;
 
 import me.dm7.barcodescanner.zbar.BarcodeFormat;
 import me.dm7.barcodescanner.zbar.Result;
@@ -59,7 +62,7 @@ public class ConfigScanningActivity extends AppCompatActivity implements ZBarSca
 	private boolean requireCameraPermission() {
 		if (!AndroidUtil.haveCameraPermission(this)) {
 			requestPermissions(new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CAMERA);
-			Toast.makeText(this, R.string.camera_permission_required, Toast.LENGTH_LONG).show();
+			// Toast.makeText(this, R.string.camera_permission_required, Toast.LENGTH_LONG).show();
 			return false;
 		}
 		return true;
@@ -69,16 +72,31 @@ public class ConfigScanningActivity extends AppCompatActivity implements ZBarSca
 	public void handleResult(Result result) {
 		String url = result.getContents();
 
-		DownloadFileTask task = new DownloadFileTask(this);
+		DownloadFileTask task = new DownloadFileTask(this, (file) -> {
+			if (file == null) {
+				setResult(RESULT_CANCELED, new Intent());
+			} else {
+				Intent data = new Intent();
+				data.setData(Uri.fromFile(file));
+				setResult(RESULT_OK, data);
+			}
+			finish();
+		});
 		task.execute(url);
+	}
+
+	private interface FileReceiver {
+		void receive(File file);
 	}
 
 	private static class DownloadFileTask extends AsyncTask<String, Integer, File> {
 		private ProgressDialog dialog;
 		private WeakReference<Context> contextReference;
 		private File filesDir;
+		private FileReceiver callback;
 
-		DownloadFileTask(Context context) {
+		DownloadFileTask(Context context, FileReceiver callback) {
+			this.callback = callback;
 			dialog = new ProgressDialog(context);
 			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			dialog.setMessage(context.getString(R.string.downloading));
@@ -95,15 +113,12 @@ public class ConfigScanningActivity extends AppCompatActivity implements ZBarSca
 
 		@Override
 		protected void onPostExecute(File file) {
-			super.onPostExecute(file);
-
 			dialog.dismiss();
+			callback.receive(file);
 		}
 
 		@Override
 		protected void onProgressUpdate(Integer... values) {
-			super.onProgressUpdate(values);
-
 			int p = values[0];
 			if (p < 0) {
 				dialog.setIndeterminate(true);

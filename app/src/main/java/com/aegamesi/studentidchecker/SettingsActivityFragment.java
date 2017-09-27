@@ -30,6 +30,7 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 	private static final int REQUEST_LOAD_ROSTER = 1;
 	private static final int REQUEST_LOAD_ROOMINFO = 2;
 	private static final int REQUEST_LOAD_PHOTOS = 3;
+	private static final int REQUEST_DOWNLOAD_QR = 4;
 
 	private Preference prefLoadPhotos;
 	private Preference prefLoadRoster;
@@ -71,6 +72,12 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 			receiveFile(data, requestCode, REQUEST_LOAD_PHOTOS, is -> {
 				StudentUtilities.loadPhotosFromZIP(realm, is);
 			});
+
+			if (requestCode == REQUEST_DOWNLOAD_QR) {
+				File file = new File(data.getData().getPath());
+				ExportUtilities.importSettingsFromZIP(realm, file);
+				updateUI();
+			}
 		}
 	}
 
@@ -127,7 +134,7 @@ public class SettingsActivityFragment extends PreferenceFragment implements Shar
 
 		prefImportSettings.setOnPreferenceClickListener(preference -> {
 			Intent intent = new Intent(getActivity(), ConfigScanningActivity.class);
-			startActivity(intent);
+			startActivityForResult(intent, REQUEST_DOWNLOAD_QR);
 			return true;
 		});
 

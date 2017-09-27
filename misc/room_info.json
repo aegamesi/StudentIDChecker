@@ -1,20 +1,47 @@
 {
 	"rooms": [
-		{"name": "RSF Fieldhouse", "id": "rsf"},
-		{"name": "1 Pimentel", "id": "pimentel"},
-		{"name": "105 Stanley", "id": "stanley"}
+		{"name": "606 Soda", "id": "606soda"},
+		{"name": "56 Barrows", "id": "56barrows"},
+		{"name": "219 Dwinelle", "id": "219dwinelle"},
+		{"name": "20 Barrows", "id": "20barrows"},
+		{"name": "102 Moffitt", "id": "102moffitt"},
+		{"name": "159 Mulford", "id": "159mulford"},
+		{"name": "105 North Gate", "id": "105northgate"},
+		{"name": "2060 VLSB", "id": "2060vlsb"}
 	],
 	"assignments": [
-		{"room": "rsf", "conditions": [
-			{"key": "section_dis", "op": ">=", "val": 111},
-			{"key": "section_dis", "op": "<=", "val": 133}
+		{"room": "606soda", "conditions": [
+			{"key": "sid_mod10000", "op": ">=", "val": 0},
+			{"key": "sid_mod10000", "op": "<=", "val": 350}
 		]},
-		{"room": "pimentel", "conditions": [
-			{"key": "section_dis", "op": "<=", "val": 143}
+		{"room": "56barrows", "conditions": [
+			{"key": "sid_mod10000", "op": ">=", "val": 351},
+			{"key": "sid_mod10000", "op": "<=", "val": 930}
 		]},
-		{"room": "stanley", "conditions": [
-			{"key": "section_dis", "op": "<=", "val": 148}
+		{"room": "219dwinelle", "conditions": [
+			{"key": "sid_mod10000", "op": ">=", "val": 931},
+			{"key": "sid_mod10000", "op": "<=", "val": 1720}
 		]},
-		{"room": "rsf", "conditions": []}
+		{"room": "20barrows", "conditions": [
+			{"key": "sid_mod10000", "op": ">=", "val": 1721},
+			{"key": "sid_mod10000", "op": "<=", "val": 2850}
+		]},
+		{"room": "102moffitt", "conditions": [
+			{"key": "sid_mod10000", "op": ">=", "val": 2851},
+			{"key": "sid_mod10000", "op": "<=", "val": 3730}
+		]},
+		{"room": "159mulford", "conditions": [
+			{"key": "sid_mod10000", "op": ">=", "val": 3731},
+			{"key": "sid_mod10000", "op": "<=", "val": 5480}
+		]},
+		{"room": "105northgate", "conditions": [
+			{"key": "sid_mod10000", "op": ">=", "val": 5481},
+			{"key": "sid_mod10000", "op": "<=", "val": 7840}
+		]},
+		{"room": "2060vlsb", "conditions": [
+			{"key": "sid_mod10000", "op": ">=", "val": 7841},
+			{"key": "sid_mod10000", "op": "<=", "val": 9999}
+		]},
+		{"room": "2060vlsb", "conditions": []}
 	]
 }

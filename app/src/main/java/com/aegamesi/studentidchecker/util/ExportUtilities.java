@@ -1,8 +1,11 @@
 package com.aegamesi.studentidchecker.util;
 
 import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
 
 import com.aegamesi.studentidchecker.models.ScanResult;
+import com.aegamesi.studentidchecker.models.Student;
 
 import org.supercsv.cellprocessor.FmtDate;
 import org.supercsv.cellprocessor.Optional;
@@ -13,9 +16,11 @@ import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -23,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import io.realm.Realm;
@@ -79,6 +85,10 @@ public class ExportUtilities {
 		try {
 			ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile)));
 
+			zos.putNextEntry(new ZipEntry("roster.csv"));
+			StudentUtilities.saveRosterToCSV(realm, zos);
+			zos.closeEntry();
+
 			zos.putNextEntry(new ZipEntry("rooms.json"));
 			RoomUtilities.saveRoomInfoToJSON(realm, zos);
 			zos.closeEntry();
@@ -89,15 +99,40 @@ public class ExportUtilities {
 			zos.closeEntry();
 			zos.setLevel(Deflater.DEFAULT_COMPRESSION);
 
-			zos.putNextEntry(new ZipEntry("roster.csv"));
-			StudentUtilities.saveRosterToCSV(realm, zos);
-			zos.closeEntry();
-
 			zos.close();
 			return zipFile;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
+		}
+	}
+
+	public static void importSettingsFromZIP(Realm realm, File file) {
+		try {
+			ZipInputStream zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(file)));
+
+			ZipEntry entry;
+			while ((entry = zis.getNextEntry()) != null) {
+				switch (entry.getName()) {
+					case "rooms.json":
+						Log.i("Import", "reading rooms.json");
+						RoomUtilities.loadRoomInfoFromJSON(realm, zis);
+						break;
+					case "photos.zip":
+						Log.i("Import", "reading photos.zip");
+						StudentUtilities.loadPhotosFromZIP(realm, zis);
+						break;
+					case "roster.csv":
+						Log.i("Import", "reading roster.csv");
+						StudentUtilities.loadRosterFromCSV(realm, zis);
+						break;
+				}
+				zis.closeEntry();
+			}
+
+			zis.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }

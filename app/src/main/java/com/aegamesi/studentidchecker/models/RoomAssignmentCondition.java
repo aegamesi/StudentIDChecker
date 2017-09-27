@@ -16,6 +16,10 @@ public class RoomAssignmentCondition extends RealmObject {
 			case "sid_mod100":
 				operand = student.studentId % 100;
 				break;
+			case "sid_mod1000":
+				operand = student.studentId % 1000;
+			case "sid_mod10000":
+				operand = student.studentId % 10000;
 			case "section_dis":
 				operand = student.sectionDis;
 				break;
